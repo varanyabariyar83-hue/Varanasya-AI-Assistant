@@ -879,43 +879,7 @@ label {
 }
 .err.show { display: block; }
 
-/* ── INSTALL BANNER ── */
-#installBanner {
-  display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 500;
-  background: linear-gradient(135deg, #111, #000);
-  border-top: 1px solid var(--border);
-  padding: 16px 20px 20px;
-  animation: slideUp 0.4s ease;
-}
-.install-row { display: flex; align-items: center; gap: 12px; }
-.install-icon {
-  width: 48px; height: 48px; flex-shrink: 0;
-  background: linear-gradient(135deg, var(--gold), var(--gold3));
-  border-radius: 12px; display: flex; align-items: center;
-  justify-content: center; font-size: 22px;
-}
-.install-text h4 { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-.install-text p { font-size: 0.75rem; color: var(--text3); line-height: 1.4; }
-#iosInstallTip {
-  display: none; margin-top: 10px; padding: 10px 12px;
-  background: var(--gold-pale); border: 1px solid var(--border2);
-  border-radius: var(--r3); font-size: 0.76rem; color: var(--text2);
-  line-height: 1.5; text-align: center;
-}
-.install-actions { display: flex; gap: 8px; margin-top: 12px; }
-.btn-install {
-  flex: 1; padding: 11px; border: none; border-radius: var(--r3);
-  font-family: 'Outfit', sans-serif; font-size: 0.84rem; font-weight: 700;
-  cursor: pointer; transition: all 0.2s;
-}
-.btn-install-yes {
-  background: linear-gradient(135deg, var(--gold), var(--gold3));
-  color: #000; box-shadow: 0 4px 12px rgba(212,175,55,0.3);
-}
-.btn-install-no {
-  background: rgba(255,255,255,0.05); color: var(--text3);
-  border: 1px solid rgba(255,255,255,0.08);
-}
+
 
 @media (min-width: 640px) {
   .scroll-area { max-width: 540px; margin: 0 auto; }
@@ -1484,21 +1448,6 @@ label {
   </div>
 </div>
 
-<!-- INSTALL BANNER -->
-<div id="installBanner">
-  <div class="install-row">
-    <div class="install-icon">🪔</div>
-    <div class="install-text">
-      <h4>Install Varanasya AI</h4>
-      <p>Add to your home screen — use like an app, anytime.</p>
-    </div>
-  </div>
-  <div id="iosInstallTip">Tap <strong style="color:var(--gold);">Share ↑</strong> in Safari → <strong style="color:var(--gold);">"Add to Home Screen"</strong></div>
-  <div class="install-actions">
-    <button class="btn-install btn-install-yes" id="installBtn">📲 Add to Home Screen</button>
-    <button class="btn-install btn-install-no" onclick="dismissInstall()">Maybe Later</button>
-  </div>
-</div>
 
 <script>
 // ═══════════════════════════
@@ -2207,36 +2156,6 @@ self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(u.hostname.i
     navigator.serviceWorker.register(swURL).catch(()=>{});
   });
 }
-let deferredPrompt = null;
-const banner = document.getElementById('installBanner');
-const installBtn = document.getElementById('installBtn');
-const iosTip = document.getElementById('iosInstallTip');
-const isInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-const dismissed = localStorage.getItem('varanasya_install_dismissed');
-function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream; }
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault(); deferredPrompt = e;
-  if (!isInstalled && !dismissed) setTimeout(() => { banner.style.display = 'block'; }, 4000);
-});
-if (isIOS() && !isInstalled && !dismissed) {
-  setTimeout(() => {
-    iosTip.style.display = 'block';
-    installBtn.textContent = '✅ Got it!';
-    installBtn.onclick = dismissInstall;
-    banner.style.display = 'block';
-  }, 4000);
-}
-installBtn.addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  deferredPrompt = null; dismissInstall();
-});
-function dismissInstall() {
-  banner.style.display = 'none';
-  localStorage.setItem('varanasya_install_dismissed', '1');
-}
-if (isInstalled) banner.style.display = 'none';
 </script>
 </body>
 </html>
